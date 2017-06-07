@@ -8,7 +8,7 @@ namespace Engine
 {
    public class Monster : LivingCreature
     {
-        public Monster(int currentHitPoints, int maximumHitPoints, int id, string name, int maximumDamage, int rewardExperiancePoints, int rewardGold) : base(currentHitPoints, maximumHitPoints)
+        public Monster( int id, string name, int maximumDamage, int rewardExperiancePoints, int rewardGold, int currentHitPoints, int maximumHitPoints) : base(currentHitPoints, maximumHitPoints)
         {
             ID = id;
             Name = name;
