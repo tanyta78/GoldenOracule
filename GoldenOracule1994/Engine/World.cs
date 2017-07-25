@@ -24,11 +24,9 @@ namespace Engine
         public const int ITEM_ID_SPIDER_SILK = 9;
         public const int ITEM_ID_ADVENTURER_PASS = 10;
 
-
         public const int MONSTER_ID_RAT = 1;
         public const int MONSTER_ID_SNAKE = 2;
         public const int MONSTER_ID_GIANT_SPIDER = 3;
-
 
         public const int QUEST_TO_CLEAR_ALCHEMIST_GARDEN = 1;
         public const int QUEST_TO_CLEAR_FARMERS_FIELD = 1;
@@ -66,14 +64,14 @@ namespace Engine
             Location farmhouse = new Location(LOCATION_ID_FARMHOUSE, "Farmhouse", "There is a small farmhouse with a farmer in front.");
             farmhouse.QuestAvailableHere = QuestByID(QUEST_TO_CLEAR_FARMERS_FIELD);
 
-            Location farmersField = new Location(LOCATION_ID_FARM_FIELD,"Farmer's field","You see rows of vegetables growing here");
+            Location farmersField = new Location(LOCATION_ID_FARM_FIELD, "Farmer's field", "You see rows of vegetables growing here");
             farmersField.MonsterLivingHere = MonsterByID(MONSTER_ID_SNAKE);
 
-            Location guardPost = new Location(LOCATION_ID_GUARD_POST,"Guard post","There is a large, tough-looking guard here.",ItemByID(ITEM_ID_ADVENTURER_PASS));
+            Location guardPost = new Location(LOCATION_ID_GUARD_POST, "Guard post", "There is a large, tough-looking guard here.", ItemByID(ITEM_ID_ADVENTURER_PASS));
 
-            Location bridge = new Location(LOCATION_ID_BRIDGE,"Bridge","A stone bridge crosses a wide river.");
+            Location bridge = new Location(LOCATION_ID_BRIDGE, "Bridge", "A stone bridge crosses a wide river.");
 
-            Location spiderField = new Location(LOCATION_ID_SPIDER_FIELD,"Forest","You see spider webs covering the trees in this forest.");
+            Location spiderField = new Location(LOCATION_ID_SPIDER_FIELD, "Forest", "You see spider webs covering the trees in this forest.");
             spiderField.MonsterLivingHere = MonsterByID(MONSTER_ID_GIANT_SPIDER);
 
             home.LocationToNorth = townSquare;
@@ -96,6 +94,9 @@ namespace Engine
             guardPost.LocationToEast = bridge;
             guardPost.LocationToWest = townSquare;
 
+            bridge.LocationToWest = guardPost;
+            bridge.LocationToEast = spiderField;
+
             spiderField.LocationToWest = bridge;
 
             Locations.Add(home);
@@ -107,14 +108,13 @@ namespace Engine
             Locations.Add(farmersField);
             Locations.Add(bridge);
             Locations.Add(spiderField);
-
         }
 
         public static Monster MonsterByID(int id)
         {
             foreach (Monster monster in Monsters)
             {
-                if (monster.ID==id)
+                if (monster.ID == id)
                 {
                     return monster;
                 }
@@ -126,7 +126,7 @@ namespace Engine
         {
             foreach (Quest quest in Quests)
             {
-                if (quest.ID==id)
+                if (quest.ID == id)
                 {
                     return quest;
                 }
@@ -138,9 +138,15 @@ namespace Engine
         private static void PopulateQuests()
         {
             Quest clearAlchemistGarden = new Quest(QUEST_TO_CLEAR_ALCHEMIST_GARDEN, "Clear the alchemist's garden", "Kill rats in the alchemist's garden and bring back 3 rat tails.You will receive a healing potion and 10 gold pieces.", 20, 10);
+
+            clearAlchemistGarden.QuestCompetionItems.Add(new QuestCompetionItem(ItemByID(ITEM_ID_RAT_TAIL), 3));
+
             clearAlchemistGarden.RewardItem = ItemByID(ITEM_ID_HEALING_POTION);
 
             Quest clearFarmersField = new Quest(QUEST_TO_CLEAR_FARMERS_FIELD, "Clear the farmer's field", "Kill snake in the farmer's field and bring back 3 snake fangs. You will receive an adventurer's pass and 20 gold pieces.", 20, 20);
+
+            clearFarmersField.QuestCompetionItems.Add(new QuestCompetionItem(ItemByID(ITEM_ID_SNAKE_FANG), 3));
+
             clearFarmersField.RewardItem = ItemByID(ITEM_ID_ADVENTURER_PASS);
 
             Quests.Add(clearAlchemistGarden);
@@ -205,10 +211,10 @@ namespace Engine
         {
             foreach (Location location in Locations)
             {
-                if (location.ID==id)
+                if (location.ID == id)
                 {
                     return location;
-                }   
+                }
             }
 
             return null;

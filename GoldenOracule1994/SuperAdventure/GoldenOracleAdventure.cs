@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;7
+using System.Windows.Forms;
 
 using Engine;
 
@@ -21,14 +21,13 @@ namespace SuperAdventure
         {
             InitializeComponent();
 
-            _player = new Player(10, 10, 20, 0, 1);
+            _player = new Player(10, 10, 20, 0);
+
             MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
+
             _player.Inventory.Add(new InventoryItem(World.ItemByID(World.ITEM_ID_RUSTY_SWORD), 1));
 
-            lblHitPoints.Text = _player.CurrentHitPoints.ToString();
-            lblGold.Text = _player.Gold.ToString();
-            lblExperiance.Text = _player.ExperiancePoints.ToString();
-            lblLevel.Text = _player.Level.ToString();
+            UpdatePlayerStats();
         }
 
         private void btnNorth_Click(object sender, EventArgs e)
@@ -53,129 +52,139 @@ namespace SuperAdventure
 
         private void MoveTo(Location newLocation)
         {
-            if (newLocation.ItemRequeredToEnter != null)
+            if (!_player.HasRequiredItemToEnterThisLocation(newLocation))
             {
-                if (!_player.HasRequiredItemToEnterThisLocation(newLocation))
+                rtbMessages.Text += "You must have a " + newLocation.ItemRequeredToEnter.Name +
+                                    " to enter this location." + Environment.NewLine;
+                return;
+            }
+
+            _player.CurrentLocation = newLocation;
+
+            btnNorth.Visible = newLocation.LocationToNorth != null;
+            btnEast.Visible = newLocation.LocationToEast != null;
+            btnSouth.Visible = newLocation.LocationToSouth != null;
+            btnWest.Visible = newLocation.LocationToWest != null;
+
+            rtbLocation.Text = newLocation.Name + Environment.NewLine;
+            rtbLocation.Text += newLocation.Description + Environment.NewLine;
+
+            _player.CurrentHitPoints = _player.MaximumHitPoints;
+
+            lblHitPoints.Text = _player.CurrentHitPoints.ToString();
+
+            if (newLocation.QuestAvailableHere != null)
+            {
+                bool playerAlreadyHasQuest = _player.HasThisQuest(newLocation.QuestAvailableHere);
+
+                bool playerAlreadyCompletedQuest = _player.CompletedThisQuest(newLocation.QuestAvailableHere);
+
+                if (playerAlreadyHasQuest)
                 {
-                    rtbMessages.Text += "You must have a " + newLocation.ItemRequeredToEnter.Name +
-                                        " to enter this location." + Environment.NewLine;
-                    return;
-                }
-
-                _player.CurrentLocation = newLocation;
-
-                btnNorth.Visible = newLocation.LocationToNorth != null;
-                btnEast.Visible = newLocation.LocationToEast != null;
-                btnSouth.Visible = newLocation.LocationToSouth != null;
-                btnWest.Visible = newLocation.LocationToWest != null;
-
-                rtbLocation.Text = newLocation.Name + Environment.NewLine;
-                rtbLocation.Text += newLocation.Description + Environment.NewLine;
-
-                _player.CurrentHitPoints = _player.MaximumHitPoints;
-
-                lblHitPoints.Text = _player.CurrentHitPoints.ToString();
-
-                if (newLocation.QuestAvailableHere != null)
-                {
-                    bool playerAlreadyHasQuest = _player.HasThisQuest(newLocation.QuestAvailableHere);
-
-                    bool playerAlreadyCompletedQuest = _player.CompletedThisQuest(newLocation.QuestAvailableHere);
-
-                    if (playerAlreadyHasQuest)
+                    if (!playerAlreadyCompletedQuest)
                     {
-                        if (!playerAlreadyCompletedQuest)
+                        bool playerHasAllItemsToCompleteQuest = _player.HasAllQuestCompletionItems(newLocation.QuestAvailableHere);
+
+                        if (playerHasAllItemsToCompleteQuest)
                         {
-                            bool playerHasAllItemsToCompleteQuest = _player.HasAllQuestCompletionItems(newLocation.QuestAvailableHere);
+                            rtbMessages.Text += Environment.NewLine;
+                            rtbMessages.Text += "You complete the " + newLocation.QuestAvailableHere.Name +
+                                                " quest." + Environment.NewLine;
 
-                            if (playerHasAllItemsToCompleteQuest)
-                            {
-                                rtbMessages.Text += Environment.NewLine;
-                                rtbMessages.Text += "You complete the " + newLocation.QuestAvailableHere.Name +
-                                                    " quest." + Environment.NewLine;
+                            _player.RemoveQuestCompletionItems(newLocation.QuestAvailableHere);
 
-                                _player.RemoveQuestCompletionItems(newLocation.QuestAvailableHere);
+                            rtbMessages.Text += "You receive: " + Environment.NewLine;
+                            rtbMessages.Text += newLocation.QuestAvailableHere.RewardExperiancePoints.ToString() + " experience points" + Environment.NewLine;
+                            rtbMessages.Text += newLocation.QuestAvailableHere.RewardGold.ToString() + " gold" + Environment.NewLine;
+                            rtbMessages.Text += newLocation.QuestAvailableHere.RewardItem.Name +
+                                                Environment.NewLine;
+                            rtbMessages.Text += Environment.NewLine;
 
-                                rtbMessages.Text += "You receive: " + Environment.NewLine;
-                                rtbMessages.Text += newLocation.QuestAvailableHere.RewardExperiancePoints.ToString() + " experience points" + Environment.NewLine;
-                                rtbMessages.Text += newLocation.QuestAvailableHere.RewardGold.ToString() + " gold" + Environment.NewLine;
-                                rtbMessages.Text += newLocation.QuestAvailableHere.RewardItem.Name +
-                                                    Environment.NewLine;
-                                rtbMessages.Text += Environment.NewLine;
+                            _player.ExperiancePoints += newLocation.QuestAvailableHere.RewardExperiancePoints;
+                            _player.Gold += newLocation.QuestAvailableHere.RewardGold;
 
-                                _player.ExperiancePoints += newLocation.QuestAvailableHere.RewardExperiancePoints;
-                                _player.Gold += newLocation.QuestAvailableHere.RewardGold;
+                            _player.AddItemToInventory(newLocation.QuestAvailableHere.RewardItem);
 
-                                _player.AddItemToInventory(newLocation.QuestAvailableHere.RewardItem);
-
-                                _player.MarkQuestCompleted(newLocation.QuestAvailableHere);
-                            }
+                            _player.MarkQuestCompleted(newLocation.QuestAvailableHere);
                         }
                     }
-                    else
-                    {
-                        rtbMessages.Text += "You receive the " + newLocation.QuestAvailableHere.Name + " quest." +
-                                            Environment.NewLine;
-                        rtbMessages.Text += newLocation.QuestAvailableHere.Description + Environment.NewLine;
-                        rtbMessages.Text += "To complete it, return with:" + Environment.NewLine;
-
-                        foreach (QuestCompetionItem questCompetionItem in newLocation.QuestAvailableHere.QuestCompetionItems)
-                        {
-                            if (questCompetionItem.Quantity == 1)
-                            {
-                                rtbMessages.Text += questCompetionItem.Quantity.ToString() + " " +
-                                                    questCompetionItem.Details.Name + Environment.NewLine;
-                            }
-                            else
-                            {
-                                rtbMessages.Text += questCompetionItem.Quantity.ToString() + " " +
-                                                    questCompetionItem.Details.NamePlural + Environment.NewLine;
-                            }
-                        }
-                        rtbMessages.Text += Environment.NewLine;
-
-                        _player.Quests.Add(new PlayerQuest(newLocation.QuestAvailableHere));
-                    }
-                }
-
-                if (newLocation.MonsterLivingHere != null)
-                {
-                    rtbMessages.Text += "You see a" + newLocation.MonsterLivingHere.Name + Environment.NewLine;
-
-                    Monster standardMonster = World.MonsterByID(newLocation.MonsterLivingHere.ID);
-
-                    _currentMonster = new Monster(standardMonster.ID, standardMonster.Name,
-                        standardMonster.MaximumDamage, standardMonster.RewardExperiancePoints,
-                        standardMonster.RewardGold, standardMonster.CurrentHitPoints, standardMonster.MaximumHitPoints);
-
-                    foreach (LootItem lootItem in standardMonster.LootTable)
-                    {
-                        _currentMonster.LootTable.Add(lootItem);
-                    }
-
-                    cboWeapons.Visible = true;
-                    cboPotions.Visible = true;
-                    btnUseWeapon.Visible = true;
-                    btnUsePotion.Visible = true;
                 }
                 else
                 {
-                    _currentMonster = null;
+                    rtbMessages.Text += "You receive the " + newLocation.QuestAvailableHere.Name + " quest." +
+                                        Environment.NewLine;
+                    rtbMessages.Text += newLocation.QuestAvailableHere.Description + Environment.NewLine;
+                    rtbMessages.Text += "To complete it, return with:" + Environment.NewLine;
 
-                    cboWeapons.Visible = false;
-                    cboPotions.Visible = false;
-                    btnUseWeapon.Visible = false;
-                    btnUsePotion.Visible = false;
+                    foreach (QuestCompetionItem questCompetionItem in newLocation.QuestAvailableHere.QuestCompetionItems)
+                    {
+                        if (questCompetionItem.Quantity == 1)
+                        {
+                            rtbMessages.Text += questCompetionItem.Quantity.ToString() + " " +
+                                                questCompetionItem.Details.Name + Environment.NewLine;
+                        }
+                        else
+                        {
+                            rtbMessages.Text += questCompetionItem.Quantity.ToString() + " " +
+                                                questCompetionItem.Details.NamePlural + Environment.NewLine;
+                        }
+                    }
+                    rtbMessages.Text += Environment.NewLine;
+
+                    _player.Quests.Add(new PlayerQuest(newLocation.QuestAvailableHere));
+                }
+            }
+
+            if (newLocation.MonsterLivingHere != null)
+            {
+                rtbMessages.Text += "You see a" + newLocation.MonsterLivingHere.Name + Environment.NewLine;
+
+                Monster standardMonster = World.MonsterByID(newLocation.MonsterLivingHere.ID);
+
+                _currentMonster = new Monster(standardMonster.ID, standardMonster.Name,
+                    standardMonster.MaximumDamage, standardMonster.RewardExperiancePoints,
+                    standardMonster.RewardGold, standardMonster.CurrentHitPoints, standardMonster.MaximumHitPoints);
+
+                foreach (LootItem lootItem in standardMonster.LootTable)
+                {
+                    _currentMonster.LootTable.Add(lootItem);
                 }
 
-                UpdateInventoryListInUI();
-
-                UpdateQuestListInUI();
-
-                UpdateWeaponListInUI();
-
-                UpdatePotionListInUI();
+                cboWeapons.Visible = true;
+                cboPotions.Visible = true;
+                btnUseWeapon.Visible = true;
+                btnUsePotion.Visible = true;
             }
+            else
+            {
+                _currentMonster = null;
+
+                cboWeapons.Visible = false;
+                cboPotions.Visible = false;
+                btnUseWeapon.Visible = false;
+                btnUsePotion.Visible = false;
+            }
+
+            UpdatePlayerStats();
+
+            UpdateInventoryListInUI();
+
+            UpdateQuestListInUI();
+
+            UpdateWeaponListInUI();
+
+            UpdatePotionListInUI();
+
+            ScrollToBottomOfMessage();
+            //}
+        }
+
+        private void UpdatePlayerStats()
+        {
+            lblHitPoints.Text = _player.CurrentHitPoints.ToString();
+            lblGold.Text = _player.Gold.ToString();
+            lblExperiance.Text = _player.ExperiancePoints.ToString();
+            lblLevel.Text = _player.Level.ToString();
         }
 
         private void UpdateInventoryListInUI()
@@ -337,11 +346,7 @@ namespace SuperAdventure
                     }
                 }
 
-                lblHitPoints.Text = _player.CurrentHitPoints.ToString();
-                lblGold.Text = _player.Gold.ToString();
-                lblExperiance.Text = _player.ExperiancePoints.ToString();
-                lblLevel.Text = _player.Level.ToString();
-
+                UpdatePlayerStats();
                 UpdateInventoryListInUI();
                 UpdateWeaponListInUI();
                 UpdatePotionListInUI();
@@ -368,6 +373,8 @@ namespace SuperAdventure
                     MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
                 }
             }
+
+            ScrollToBottomOfMessage();
         }
 
         private void btnUsePotion_Click(object sender, EventArgs e)
@@ -409,6 +416,14 @@ namespace SuperAdventure
             lblHitPoints.Text = _player.CurrentHitPoints.ToString();
             UpdateInventoryListInUI();
             UpdatePotionListInUI();
+
+            ScrollToBottomOfMessage();
+        }
+
+        private void ScrollToBottomOfMessage()
+        {
+            rtbMessages.SelectionStart = rtbMessages.Text.Length;
+            rtbMessages.ScrollToCaret();
         }
     }
 }
