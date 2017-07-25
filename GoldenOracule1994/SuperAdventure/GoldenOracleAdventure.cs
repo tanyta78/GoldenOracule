@@ -107,7 +107,7 @@ namespace SuperAdventure
                                                 Environment.NewLine;
                             rtbMessages.Text += Environment.NewLine;
 
-                            _player.ExperiancePoints += newLocation.QuestAvailableHere.RewardExperiancePoints;
+                            _player.AddExperiancePoint(newLocation.QuestAvailableHere.RewardExperiancePoints);
                             _player.Gold += newLocation.QuestAvailableHere.RewardGold;
 
                             _player.AddItemToInventory(newLocation.QuestAvailableHere.RewardItem);
@@ -316,7 +316,7 @@ namespace SuperAdventure
                 rtbMessages.Text += Environment.NewLine;
                 rtbMessages.Text += "You defeated the " + _currentMonster.Name + Environment.NewLine;
 
-                _player.ExperiancePoints += _currentMonster.RewardExperiancePoints;
+                _player.AddExperiancePoint(_currentMonster.RewardExperiancePoints);
                 rtbMessages.Text += "You receive " + _currentMonster.RewardExperiancePoints.ToString() +
                                     " experiance points" + Environment.NewLine;
 
