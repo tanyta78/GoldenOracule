@@ -9,6 +9,7 @@ namespace Engine
     {
         public int Gold { get; set; }
         public int ExperiancePoints { get; set; }
+        public Weapon CurrentWeapon { get; set; }
 
         public int Level
         {
@@ -54,6 +55,12 @@ namespace Engine
 
                 int currentLocationID = Convert.ToInt32(playerData.SelectSingleNode("/Player/Stats/CurrentLocation").InnerText);
                 player.CurrentLocation = World.LocationByID(currentLocationID);
+
+                if (playerData.SelectSingleNode("/Player/Stats/CurrentWeapon") != null)
+                {
+                    int currentWeaponID = Convert.ToInt32(playerData.SelectSingleNode("/Player/Stats/CurrentWeapon").InnerText);
+                    player.CurrentWeapon = (Weapon)World.ItemByID(currentWeaponID);
+                }
 
                 foreach (XmlNode node in playerData.SelectNodes("/Player/InventoryItems/InventoryItem"))
                 {
@@ -195,6 +202,13 @@ namespace Engine
             XmlNode currentLocation = playerData.CreateElement("CurrentLocation");
             currentLocation.AppendChild(playerData.CreateTextNode(this.CurrentLocation.ID.ToString()));
             stats.AppendChild(currentLocation);
+
+            if (CurrentWeapon != null)
+            {
+                XmlNode currentWeapon = playerData.CreateElement("CurrentWeapon");
+                currentWeapon.AppendChild(playerData.CreateTextNode(this.CurrentWeapon.ID.ToString()));
+                stats.AppendChild(currentWeapon);
+            }
 
             // Create the "InventoryItems" child node to hold each InventoryItem node
             XmlNode inventoryItems = playerData.CreateElement("InventoryItems");
