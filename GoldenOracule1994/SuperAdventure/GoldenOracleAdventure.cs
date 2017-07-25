@@ -32,9 +32,12 @@ namespace SuperAdventure
                 _player = Player.CreateDefaultPlayer();
             }
 
-            MoveTo(_player.CurrentLocation);
+            lblHitPoints.DataBindings.Add("Text", _player, "CurrentHitPoints");
+            lblGold.DataBindings.Add("Text", _player, "Gold");
+            lblExperiance.DataBindings.Add("Text", _player, "ExperiencePoints");
+            lblLevel.DataBindings.Add("Text", _player, "Level");
 
-            UpdatePlayerStats();
+            MoveTo(_player.CurrentLocation);
         }
 
         private void btnNorth_Click(object sender, EventArgs e)
@@ -77,8 +80,6 @@ namespace SuperAdventure
             rtbLocation.Text += newLocation.Description + Environment.NewLine;
 
             _player.CurrentHitPoints = _player.MaximumHitPoints;
-
-            lblHitPoints.Text = _player.CurrentHitPoints.ToString();
 
             if (newLocation.QuestAvailableHere != null)
             {
@@ -172,8 +173,6 @@ namespace SuperAdventure
                 btnUsePotion.Visible = false;
             }
 
-            UpdatePlayerStats();
-
             UpdateInventoryListInUI();
 
             UpdateQuestListInUI();
@@ -187,7 +186,6 @@ namespace SuperAdventure
 
         private void UpdatePlayerStats()
         {
-            lblHitPoints.Text = _player.CurrentHitPoints.ToString();
             lblGold.Text = _player.Gold.ToString();
             lblExperiance.Text = _player.ExperiancePoints.ToString();
             lblLevel.Text = _player.Level.ToString();
@@ -361,7 +359,6 @@ namespace SuperAdventure
                     }
                 }
 
-                UpdatePlayerStats();
                 UpdateInventoryListInUI();
                 UpdateWeaponListInUI();
                 UpdatePotionListInUI();
@@ -378,8 +375,6 @@ namespace SuperAdventure
                                     " points of damage." + Environment.NewLine;
 
                 _player.CurrentHitPoints -= damageToPlayer;
-
-                lblHitPoints.Text = _player.CurrentHitPoints.ToString();
 
                 if (_player.CurrentHitPoints <= 0)
                 {
@@ -428,7 +423,6 @@ namespace SuperAdventure
                 MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
             }
 
-            lblHitPoints.Text = _player.CurrentHitPoints.ToString();
             UpdateInventoryListInUI();
             UpdatePotionListInUI();
 

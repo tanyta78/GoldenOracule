@@ -50,6 +50,7 @@
     <Compile Include="NumberAssigner.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PlayerQuest.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Quest.cs" />
     <Compile Include="QuestCompetionItem.cs" />

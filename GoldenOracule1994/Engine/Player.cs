@@ -7,8 +7,30 @@ namespace Engine
 {
     public class Player : LivingCreature
     {
-        public int Gold { get; set; }
-        public int ExperiancePoints { get; private set; }
+        private int _gold;
+        private int _experiancePoints;
+
+        public int Gold
+        {
+            get { return _gold; }
+            set
+            {
+                _gold = value;
+                OnPropertyChanged(nameof(Gold));
+            }
+        }
+
+        public int ExperiancePoints
+        {
+            get { return _experiancePoints; }
+            private set
+            {
+                _experiancePoints = value;
+                OnPropertyChanged(nameof(ExperiancePoints));
+                OnPropertyChanged(nameof(Level));
+            }
+        }
+
         public Weapon CurrentWeapon { get; set; }
 
         public int Level
