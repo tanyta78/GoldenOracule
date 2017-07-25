@@ -22,7 +22,7 @@ namespace Engine
             set
             {
                 _currentHitPoints = value;
-                OnPropertyChanged(nameof(CurrentHitPoints));
+                OnPropertyChanged("CurrentHitPoints");
             }
         }
 
@@ -36,8 +36,7 @@ namespace Engine
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [NotifyPropertyChangedInvocator]
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        protected void OnPropertyChanged(string name)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }

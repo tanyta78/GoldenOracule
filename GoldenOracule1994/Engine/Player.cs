@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
+using System.ComponentModel;
 
 namespace Engine
 {
@@ -16,7 +17,7 @@ namespace Engine
             set
             {
                 _gold = value;
-                OnPropertyChanged(nameof(Gold));
+                OnPropertyChanged("Gold");
             }
         }
 
@@ -26,8 +27,8 @@ namespace Engine
             private set
             {
                 _experiancePoints = value;
-                OnPropertyChanged(nameof(ExperiancePoints));
-                OnPropertyChanged(nameof(Level));
+                OnPropertyChanged("ExperiancePoints");
+                OnPropertyChanged("Level");
             }
         }
 
@@ -38,8 +39,8 @@ namespace Engine
             get { return ((ExperiancePoints / 100) + 1); }
         }
 
-        public List<InventoryItem> Inventory { get; set; }
-        public List<PlayerQuest> Quests { get; set; }
+        public BindingList<InventoryItem> Inventory { get; set; }
+        public BindingList<PlayerQuest> Quests { get; set; }
         public Location CurrentLocation { get; set; }
 
         private Player(int currentHitPoints, int maximumHitPoints, int gold, int experiancePoints) : base(currentHitPoints, maximumHitPoints)
@@ -47,8 +48,8 @@ namespace Engine
             Gold = gold;
             ExperiancePoints = experiancePoints;
 
-            Inventory = new List<InventoryItem>();
-            Quests = new List<PlayerQuest>();
+            Inventory = new BindingList<InventoryItem>();
+            Quests = new BindingList<PlayerQuest>();
         }
 
         public static Player CreateDefaultPlayer()
@@ -77,9 +78,9 @@ namespace Engine
                 int currentHitPoints = Convert.ToInt32(playerData.SelectSingleNode("/Player/Stats/CurrentHitPoints").InnerText);
                 int maximumHitPoints = Convert.ToInt32(playerData.SelectSingleNode("/Player/Stats/MaximumHitPoints").InnerText);
                 int gold = Convert.ToInt32(playerData.SelectSingleNode("/Player/Stats/Gold").InnerText);
-                int experiencePoints = Convert.ToInt32(playerData.SelectSingleNode("/Player/Stats/ExperiencePoints").InnerText);
+                int experiancePoints = Convert.ToInt32(playerData.SelectSingleNode("/Player/Stats/ExperiancePoints").InnerText);
 
-                Player player = new Player(currentHitPoints, maximumHitPoints, gold, experiencePoints);
+                Player player = new Player(currentHitPoints, maximumHitPoints, gold, experiancePoints);
 
                 int currentLocationID = Convert.ToInt32(playerData.SelectSingleNode("/Player/Stats/CurrentLocation").InnerText);
                 player.CurrentLocation = World.LocationByID(currentLocationID);
@@ -127,12 +128,12 @@ namespace Engine
                 return true;
             }
 
-            return Inventory.Exists(ii => ii.Details.ID == location.ItemRequeredToEnter.ID);
+            return Inventory.Any(ii => ii.Details.ID == location.ItemRequeredToEnter.ID);
         }
 
         public bool HasThisQuest(Quest quest)
         {
-            return Quests.Exists(pq => pq.Details.ID == quest.ID);
+            return Quests.Any(pq => pq.Details.ID == quest.ID);
         }
 
         public bool CompletedThisQuest(Quest quest)
@@ -152,7 +153,7 @@ namespace Engine
         {
             foreach (var questCompetionItem in quest.QuestCompetionItems)
             {
-                if (!Inventory.Exists(ii => ii.Details.ID == questCompetionItem.Details.ID && ii.Quantity >= questCompetionItem.Quantity))
+                if (!Inventory.Any(ii => ii.Details.ID == questCompetionItem.Details.ID && ii.Quantity >= questCompetionItem.Quantity))
                 {
                     return false;
                 }
@@ -223,9 +224,9 @@ namespace Engine
             gold.AppendChild(playerData.CreateTextNode(this.Gold.ToString()));
             stats.AppendChild(gold);
 
-            XmlNode experiencePoints = playerData.CreateElement("ExperiencePoints");
-            experiencePoints.AppendChild(playerData.CreateTextNode(this.ExperiancePoints.ToString()));
-            stats.AppendChild(experiencePoints);
+            XmlNode experiancePoints = playerData.CreateElement("ExperiancePoints");
+            experiancePoints.AppendChild(playerData.CreateTextNode(this.ExperiancePoints.ToString()));
+            stats.AppendChild(experiancePoints);
 
             XmlNode currentLocation = playerData.CreateElement("CurrentLocation");
             currentLocation.AppendChild(playerData.CreateTextNode(this.CurrentLocation.ID.ToString()));
