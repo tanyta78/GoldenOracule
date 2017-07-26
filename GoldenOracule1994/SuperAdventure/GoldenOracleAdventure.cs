@@ -1,17 +1,11 @@
-﻿using System;
+﻿using Engine;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.IO;
+using System.Linq;
+using System.Windows.Forms;
 
-using Engine;
-
-//20.4 Moving the game logic functions from the UI project to the Engine project//
 namespace SuperAdventure
 {
     public partial class GoldenOracleAdventure : Form
@@ -125,6 +119,8 @@ namespace SuperAdventure
                 btnSouth.Visible = (_player.CurrentLocation.LocationToSouth != null);
                 btnWest.Visible = (_player.CurrentLocation.LocationToWest != null);
 
+                btnTrade.Visible = (_player.CurrentLocation.VendorWorkingHere != null);
+
                 // Display current location name and description
                 rtbLocation.Text = _player.CurrentLocation.Name + Environment.NewLine;
                 rtbLocation.Text += _player.CurrentLocation.Description + Environment.NewLine;
@@ -173,47 +169,11 @@ namespace SuperAdventure
             _player.UseWeapon(currentWeapon);
         }
 
-        private void UpdatePotionListInUI()
-        {
-            List<HealingPotion> healingPotions = new List<HealingPotion>();
-
-            foreach (InventoryItem inventoryItem in _player.Inventory)
-            {
-                if (inventoryItem.Details is HealingPotion)
-                {
-                    if (inventoryItem.Quantity > 0)
-                    {
-                        healingPotions.Add((HealingPotion)inventoryItem.Details);
-                    }
-                }
-            }
-
-            if (healingPotions.Count == 0)
-            {
-                cboPotions.Visible = false;
-                btnUsePotion.Visible = false;
-            }
-            else
-            {
-                cboPotions.DataSource = healingPotions;
-                cboPotions.DisplayMember = "Name";
-                cboPotions.ValueMember = "ID";
-
-                cboPotions.SelectedIndex = 0;
-            }
-        }
-
         private void btnUsePotion_Click(object sender, EventArgs e)
         {
             HealingPotion potion = (HealingPotion)cboPotions.SelectedItem;
 
             _player.UsePotion(potion);
-        }
-
-        private void ScrollToBottomOfMessage()
-        {
-            rtbMessages.SelectionStart = rtbMessages.Text.Length;
-            rtbMessages.ScrollToCaret();
         }
 
         private void GoldenOracleAdventure_FormClosing(object sender, FormClosingEventArgs e)
@@ -237,6 +197,13 @@ namespace SuperAdventure
 
             rtbMessages.SelectionStart = rtbMessages.Text.Length;
             rtbMessages.ScrollToCaret();
+        }
+
+        private void btnTrade_Click(object sender, EventArgs e)
+        {
+            TradingScreen tradingScreen = new TradingScreen(_player);
+            tradingScreen.StartPosition = FormStartPosition.CenterParent;
+            tradingScreen.ShowDialog(this);
         }
     }
 }

@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using Engine.Annotations;
+﻿using System.ComponentModel;
 
 namespace Engine
 {
@@ -14,6 +6,16 @@ namespace Engine
     {
         private Item _details;
         private int _quantity;
+
+        public int ItemID
+        {
+            get { return Details.ID; }
+        }
+
+        public int Price
+        {
+            get { return Details.Price; }
+        }
 
         public InventoryItem(Item details, int quantity)
         {

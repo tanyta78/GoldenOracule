@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Engine
 {
-   public class Monster : LivingCreature
+    public class Monster : LivingCreature
     {
-        public Monster( int id, string name, int maximumDamage, int rewardExperiancePoints, int rewardGold, int currentHitPoints, int maximumHitPoints) : base(currentHitPoints, maximumHitPoints)
+        public Monster(int id, string name, int maximumDamage, int rewardExperiancePoints, int rewardGold, int currentHitPoints, int maximumHitPoints) : base(currentHitPoints, maximumHitPoints)
         {
             ID = id;
             Name = name;
@@ -16,7 +12,6 @@ namespace Engine
             RewardExperiancePoints = rewardExperiancePoints;
             RewardGold = rewardGold;
             LootTable = new List<LootItem>();
-
         }
 
         public int ID { get; set; }
@@ -25,6 +20,5 @@ namespace Engine
         public int RewardExperiancePoints { get; set; }
         public int RewardGold { get; set; }
         public List<LootItem> LootTable { get; set; }
-
     }
 }

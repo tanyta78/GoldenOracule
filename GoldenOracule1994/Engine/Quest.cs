@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Engine
 {
-  public class Quest
+    public class Quest
     {
         public int ID { get; set; }
         public string Name { get; set; }
@@ -22,10 +18,9 @@ namespace Engine
             Description = description;
             RewardExperiancePoints = rewardExperiancePoints;
             RewardGold = rewardGold;
-            QuestCompetionItems=new List<QuestCompetionItem>();
+            QuestCompetionItems = new List<QuestCompetionItem>();
         }
 
         public List<QuestCompetionItem> QuestCompetionItems { get; set; }
-
     }
 }
